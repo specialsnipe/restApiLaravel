@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+    nginx:
+        build:
+            context: docker/nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./:/app
+        depends_on:
+            - php-fpm
+
+    php-fpm:
+        build:
+            context: docker/php-fpm
+        volumes:
+            - ./:/app
+            - /bin/chmod 755 /app/storage/logs
+            - /bin/chmod 644 /app/storage/logs/laravel.log
+
+    php-cli:
+        build:
+            context: docker/php-cli
+        volumes:
+            - ./:/app
+
+    pgsql:
+        image: postgres:14.8-alpine3.18
+        environment:
+            - POSTGRES_DB=restApi
+            - POSTGRES_USER=user
+            - POSTGRES_PASSWORD=123
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+volumes:
+    postgres_data:
